@@ -4,12 +4,12 @@ import os
 import uuid
 from datetime import datetime
 
-from services.pdf_processor import extract_text_from_pdf
-from services.rag_pipeline import process_homework
-from utils.file_helpers import save_upload_file, create_feedback_pdf
+from services.marking_engine import MarkingEngine
+from utils.file_helpers import save_upload_file
 from config import UPLOAD_FOLDER
 
 router = APIRouter()
+marking_engine = MarkingEngine()
 
 @router.post("/upload/", summary="Upload marking criteria and homework PDFs")
 async def upload_files(
@@ -32,12 +32,16 @@ async def upload_files(
     criteria_path = await save_upload_file(marking_criteria, f"{job_id}_criteria.pdf")
     homework_path = await save_upload_file(homework, f"{job_id}_homework.pdf")
     
+    # Define output path
+    output_path = os.path.join(UPLOAD_FOLDER, f"{job_id}_feedback.pdf")
+    
     # Process PDFs in background
     background_tasks.add_task(
         process_submission,
         job_id,
         criteria_path,
         homework_path,
+        output_path,
         student_name,
         assignment_title
     )
@@ -66,24 +70,15 @@ async def get_results(job_id: str):
         media_type="application/pdf"
     )
 
-async def process_submission(job_id, criteria_path, homework_path, student_name, assignment_title):
+async def process_submission(job_id, criteria_path, homework_path, output_path, student_name, assignment_title):
     try:
-        # Extract text from PDFs
-        criteria_text = extract_text_from_pdf(criteria_path)
-        homework_text = extract_text_from_pdf(homework_path)
-        
-        # Process with RAG pipeline
-        feedback, marks = process_homework(criteria_text, homework_text)
-        
-        # Generate feedback PDF
-        feedback_path = os.path.join(UPLOAD_FOLDER, f"{job_id}_feedback.pdf")
-        create_feedback_pdf(
-            feedback_path,
-            feedback,
-            marks,
-            student_name or "Unknown Student",
-            assignment_title or "Untitled Assignment"
+        await marking_engine.process_submission(
+            criteria_path,
+            homework_path,
+            output_path,
+            student_name,
+            assignment_title
         )
     except Exception as e:
-        # Log error and create error report
+        # Log error - the marking engine will generate an error report PDF
         print(f"Error processing submission {job_id}: {str(e)}") 

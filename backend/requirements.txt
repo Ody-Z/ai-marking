@@ -1,9 +1,8 @@
 fastapi==0.103.1
 uvicorn==0.23.2
-langchain==0.0.267
-pinecone-client==2.2.2
-openai==0.28.0
-PyPDF2==3.0.1
-reportlab==4.0.4
+python-multipart==0.0.6
 python-dotenv==1.0.0
-python-multipart==0.0.6 
+requests==2.31.0
+markdown==3.4.4
+weasyprint==60.1
+markitdown==1.0.0  # Microsoft MarkItDown library 

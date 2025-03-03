@@ -1,68 +1,58 @@
-# .cursorrules
 project: "MVP Homework Marking System"
 description: >
-  This MVP is an AI-driven homework marking system. It allows users to upload a marking criteria PDF and a student homework PDF.
-  The system processes these inputs using a basic Retrieval Augmented Generation (RAG) pipeline powered by LangChain,
-  integrates with Pinecone for vector search, and outputs a feedback PDF containing marks and detailed comments.
-
+  This MVP is an AI-driven homework marking system designed for quick iteration.
+  Users can upload a marking criteria PDF and a student homework PDF.
+  The backend uses Microsoft MarkItDown to convert the PDFs to Markdown, feeds the extracted text
+  into an LLM (via our llm_service) for generating marks and feedback, and finally renders the
+  (potentially edited) Markdown back into a PDF for download.
+  
 techStack:
   backend:
     language: Python
     framework: FastAPI
     libraries:
-      - LangChain         # For managing RAG workflows.
-      - pinecone-client   # To interface with the Pinecone vector database.
-      - PyPDF2            # For extracting text from PDF files.
-      - reportlab         # For generating PDF feedback reports.
-    services:
-      - pdf_processor: "Extracts text from uploaded PDFs."
-      - llm_service: "Interacts with the LLM (e.g., GPT-4) to generate marks and feedback."
-      - rag_pipeline: "Orchestrates the RAG flow using LangChain to enrich content using Pinecone."
-      - pinecone_service: "Manages vector operations (indexing, querying) with Pinecone."
+      - markitdown: "Microsoft's open-source tool for converting PDFs (and other file types) to Markdown."
+      - markdown-pdf: "Library (or md2pdf alternative) for converting Markdown back to PDF."
+      - requests: "Used to call the LLM API for feedback generation."
+    description: "The backend orchestrates file uploads, conversion workflows, LLM interactions, and PDF output."
   frontend:
-    language: HTML, CSS, JavaScript
-    description: "A simple user interface for file uploads and displaying status/feedback."
+    languages: [HTML, CSS, JavaScript]
+    description: "A simple interface that allows users to upload PDFs and displays the status/feedback."
   containerization:
     tool: Docker
     orchestrator: docker-compose
 
 fileStructure:
   backend:
-    - app.py: "Entry point for the FastAPI application; initializes the server and registers routes."
-    - config.py: "Holds configuration settings (API keys, Pinecone config, environment variables)."
-    - endpoints/
-      - upload.py: "Defines API endpoints for handling PDF uploads and triggering processing."
-    - models/
-      - __init__.py: "Placeholder for data models; useful for future expansion."
-    - services/
-      - pdf_processor.py: "Extracts text content from uploaded PDF files."
-      - llm_service.py: "Wraps LLM API calls to generate feedback and marks."
-      - rag_pipeline.py: "Implements the basic RAG workflow using LangChain to retrieve context and form prompts."
-      - pinecone_service.py: "Handles all operations with the Pinecone vector database."
-    - utils/
-      - file_helpers.py: "Contains utility functions for file management and temporary storage."
-    - requirements.txt: "Lists all Python dependencies required for the backend."
-    - Dockerfile: "Dockerfile to containerize the backend application."
-    - README.md: "Documentation specific to backend setup and usage."
+    - app.py: "Entry point for the FastAPI application; initializes the server and registers endpoints."
+    - config.py: "Holds configuration settings (API keys, Pinecone config if used later, ports, environment variables)."
+    - services/pdf_processor.py: "Uses MarkItDown to convert uploaded PDFs into Markdown text for further processing."
+    - services/llm_service.py: "Handles API calls to the LLM (e.g., GPT-4) for generating marks and feedback based on the Markdown content."
+    - services/marking_engine.py: "Orchestrates the full workflow: receives uploaded files, calls the pdf_processor and llm_service, and then triggers Markdown-to-PDF conversion."
+    - utils/file_helpers.py: "Contains helper functions for file I/O operations, temporary storage, and format conversions."
+    - requirements.txt: "Lists all Python dependencies (FastAPI, markitdown, markdown-pdf or md2pdf, requests, etc.)."
+    - Dockerfile: "Dockerfile for containerizing the backend application."
+    - README.md: "Documentation for backend setup, usage, and development guidelines."
   frontend:
-    - index.html: "Basic HTML page for uploading PDFs."
-    - app.js: "JavaScript to manage file uploads and communicate with backend endpoints."
-    - styles.css: "Basic styling for the upload interface."
-    - README.md: "Documentation for frontend setup and usage."
+    - index.html: "A simple HTML page that provides a form for uploading PDFs."
+    - app.js: "JavaScript to handle file uploads, communicate with the backend API, and display results."
+    - styles.css: "Basic CSS styling for the upload page and UI elements."
+    - README.md: "Documentation for setting up and using the frontend."
   root:
-    - docker-compose.yml: "Orchestrates the containers for backend and frontend."
-    - .env: "Stores environment variables (API keys, ports, Pinecone config, etc.)."
-    - README.md: "Overall project documentation and setup instructions."
+    - docker-compose.yml: "Orchestrates the backend and frontend containers for local development and deployment."
+    - .env: "Holds environment variables (API keys, ports, etc.) to keep sensitive data out of source code."
+    - README.md: "Overall project documentation, including setup instructions and high-level overview."
 
 codeGuidelines:
-  - "Maintain a modular file structure with clear separation between services, endpoints, and utilities."
-  - "Include inline comments and file-level documentation for clarity."
-  - "Implement proper error handling and logging in all services."
-  - "Ensure that any changes align with the defined file structure and tech stack."
-  - "Keep the MVP simple but modular enough to allow for future enhancements."
+  - "Maintain the modular file structure as defined above to ensure separation of concerns between services, utilities, and endpoints."
+  - "Include clear inline comments and file-level documentation for every module."
+  - "Adhere to PEP8 and FastAPI best practices for coding and endpoint design."
+  - "Sensitive configuration (API keys, etc.) must be stored in the .env file."
+  - "Ensure that all new code is accompanied by tests and updates to the README.md where applicable."
 
 cursorRules:
-  - "When developing new features or modifications, refer to this .cursorrules file to ensure consistency with the technical stack."
-  - "Follow the provided file structure and naming conventions."
-  - "All new code should include appropriate documentation and adhere to the specified coding guidelines."
-  - "Use FastAPI for backend endpoints, LangChain for the RAG pipeline, and Pinecone for vector operations."
+  - "Follow the provided file structure and naming conventions strictly to maintain consistency."
+  - "When adding or modifying code, ensure it aligns with the specified technical stack: use MarkItDown for PDF-to-Markdown conversion and markdown-pdf (or md2pdf) for rendering Markdown back to PDF."
+  - "All new services or utilities should include documentation and unit tests."
+  - "Check this .cursorrules file regularly to ensure that your contributions remain consistent with the overall project guidelines."
+  - "Any modifications to the conversion workflow must be clearly documented and justified in code comments and the README files."

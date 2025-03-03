@@ -1,111 +1,107 @@
-from langchain.llms import OpenAI
-from langchain.prompts import PromptTemplate
 import logging
+import requests
+import json
 from config import OPENAI_API_KEY, LLM_MODEL, LLM_TEMPERATURE, LLM_MAX_TOKENS
 
 logger = logging.getLogger(__name__)
 
-# Initialize LLM
-def get_llm():
-    """Initialize and return the LLM instance"""
-    return OpenAI(
-        openai_api_key=OPENAI_API_KEY,
-        model_name=LLM_MODEL,
-        temperature=LLM_TEMPERATURE,
-        max_tokens=LLM_MAX_TOKENS
-    )
-
-def generate_feedback(criteria_text, homework_text, relevant_context=None):
+class LLMService:
     """
-    Generate feedback and marks for a student's homework using the LLM.
+    Handles interactions with the LLM API for generating feedback.
+    """
     
-    Args:
-        criteria_text (str): Text from the marking criteria PDF
-        homework_text (str): Text from the student's homework PDF
-        relevant_context (str, optional): Additional context from RAG
+    def __init__(self):
+        logger.info(f"Initializing LLM Service using model: {LLM_MODEL}")
+        self.api_key = OPENAI_API_KEY
+        self.model = LLM_MODEL
+        self.temperature = LLM_TEMPERATURE
+        self.max_tokens = LLM_MAX_TOKENS
         
-    Returns:
-        tuple: (feedback, marks)
-    """
-    logger.info("Generating feedback using LLM")
+        if not self.api_key:
+            logger.warning("No API key provided for the LLM service")
     
-    # Create base prompt
-    base_prompt = """
-    You are an AI assistant designed to grade student homework based on provided marking criteria.
-    
-    ## Marking Criteria:
-    {criteria_text}
-    
-    ## Student Submission:
-    {homework_text}
-    
-    """
-    
-    # Add relevant context if available
-    if relevant_context:
-        base_prompt += """
-        ## Additional Context:
-        {relevant_context}
+    def generate_feedback(self, criteria_markdown, homework_markdown):
         """
-    
-    # Complete the prompt with instructions
-    base_prompt += """
-    Based on the marking criteria and the student's submission, provide:
-    
-    1. Detailed feedback on the submission, highlighting strengths and areas for improvement
-    2. A numerical mark or grade according to the marking criteria
-    3. Specific recommendations for how the student can improve their work
-    
-    Format your response as follows:
-    
-    MARK: [numerical mark]
-    
-    FEEDBACK:
-    [Your detailed feedback here]
-    
-    RECOMMENDATIONS:
-    [Your specific recommendations for improvement]
-    """
-    
-    # Create the prompt template
-    prompt_template = PromptTemplate(
-        input_variables=["criteria_text", "homework_text", "relevant_context"] if relevant_context else ["criteria_text", "homework_text"],
-        template=base_prompt
-    )
-    
-    # Format the prompt
-    if relevant_context:
-        prompt = prompt_template.format(
-            criteria_text=criteria_text,
-            homework_text=homework_text,
-            relevant_context=relevant_context
-        )
-    else:
-        prompt = prompt_template.format(
-            criteria_text=criteria_text,
-            homework_text=homework_text
-        )
-    
-    # Get LLM and generate response
-    llm = get_llm()
-    response = llm(prompt)
-    
-    try:
-        # Parse the response to extract mark and feedback
-        mark_line = response.split("MARK:")[1].split("\n")[0].strip()
-        feedback_section = response.split("FEEDBACK:")[1].split("RECOMMENDATIONS:")[0].strip()
-        recommendations = response.split("RECOMMENDATIONS:")[1].strip()
+        Generate feedback and marks based on marking criteria and homework submission.
         
-        # Clean up and format the mark
+        Args:
+            criteria_markdown (str): Markdown content of the marking criteria
+            homework_markdown (str): Markdown content of the student's homework
+            
+        Returns:
+            tuple: (feedback_markdown, marks)
+        """
+        logger.info("Generating feedback using LLM")
+        
+        # Prepare the prompt for the LLM
+        prompt = self._create_prompt(criteria_markdown, homework_markdown)
+        
         try:
-            mark = float(mark_line)
-        except ValueError:
-            mark = mark_line
-        
-        # Combine feedback and recommendations
-        full_feedback = f"{feedback_section}\n\nRECOMMENDATIONS:\n{recommendations}"
-        
-        return full_feedback, mark
-    except Exception as e:
-        logger.error(f"Error parsing LLM response: {str(e)}")
-        return response, "N/A" 
+            # Call the OpenAI API
+            headers = {
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {self.api_key}"
+            }
+            
+            payload = {
+                "model": self.model,
+                "messages": [
+                    {"role": "system", "content": "You are an AI assistant that generates feedback for student homework based on marking criteria."},
+                    {"role": "user", "content": prompt}
+                ],
+                "temperature": self.temperature,
+                "max_tokens": self.max_tokens
+            }
+            
+            response = requests.post(
+                "https://api.openai.com/v1/chat/completions",
+                headers=headers,
+                data=json.dumps(payload)
+            )
+            
+            response.raise_for_status()
+            response_data = response.json()
+            
+            # Extract the response content
+            feedback_text = response_data["choices"][0]["message"]["content"]
+            
+            # Process the response to extract marks and feedback
+            marks, feedback_markdown = self._process_response(feedback_text)
+            
+            logger.info(f"Successfully generated feedback with mark: {marks}")
+            return feedback_markdown, marks
+            
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Error calling LLM API: {str(e)}")
+            raise
+        except Exception as e:
+            logger.error(f"Error processing LLM response: {str(e)}")
+            raise
+    
+    def _create_prompt(self, criteria_markdown, homework_markdown):
+        """Create the prompt for the LLM"""
+        return f"""
+# Task: Grade the following student homework based on the provided marking criteria.
+
+## Marking Criteria:
+{criteria_markdown}
+
+## Student Submission:
+{homework_markdown}
+
+Based on the marking criteria and the student's submission, provide:
+
+1. Detailed feedback on the submission, highlighting strengths and areas for improvement
+2. A numerical mark or grade according to the marking criteria
+3. Specific recommendations for how the student can improve their work
+
+Format your response as follows:
+
+MARK: [numerical mark]
+
+FEEDBACK:
+[Your detailed feedback here]
+
+RECOMMENDATIONS:
+[Your specific recommendations for improvement]
+""" 
