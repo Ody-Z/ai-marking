@@ -5,4 +5,5 @@ python-dotenv==1.0.0
 requests==2.31.0
 markdown==3.4.4
 weasyprint==60.1
-markitdown==1.0.0  # Microsoft MarkItDown library 
+markitdown==0.0.1a5  # Microsoft MarkItDown library for PDF to Markdown conversion
+beautifulsoup4==4.12.2  # For HTML parsing 

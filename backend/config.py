@@ -12,12 +12,18 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 # File storage configuration
 UPLOAD_FOLDER = os.getenv("UPLOAD_FOLDER", "uploads")
-MAX_CONTENT_LENGTH = int(os.getenv("MAX_CONTENT_LENGTH", 16 * 1024 * 1024))  # Default 16MB
+MAX_CONTENT_LENGTH = int(
+    os.getenv("MAX_CONTENT_LENGTH", 16 * 1024 * 1024))  # Default 16MB
 
 # LLM configuration
 LLM_MODEL = os.getenv("LLM_MODEL", "gpt-4")
 LLM_TEMPERATURE = float(os.getenv("LLM_TEMPERATURE", 0.2))
 LLM_MAX_TOKENS = int(os.getenv("LLM_MAX_TOKENS", 1000))
 
+# MarkItDown configuration
+MARKITDOWN_ENABLE_PLUGINS = os.getenv(
+    "MARKITDOWN_ENABLE_PLUGINS", "False").lower() in ("true", "1", "t")
+MARKITDOWN_DOCINTEL_ENDPOINT = os.getenv("MARKITDOWN_DOCINTEL_ENDPOINT")
+
 # Create upload directory if it doesn't exist
-os.makedirs(UPLOAD_FOLDER, exist_ok=True) 
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
