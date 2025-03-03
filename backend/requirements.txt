@@ -7,3 +7,4 @@ markdown==3.4.4
 weasyprint==60.1
 markitdown==0.0.1a5  # Microsoft MarkItDown library for PDF to Markdown conversion
 beautifulsoup4==4.12.2  # For HTML parsing 
+reportlab==4.1.0  # For PDF generation in tests 
