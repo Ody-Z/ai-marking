@@ -6,7 +6,6 @@ load_dotenv()
 
 # API keys and service configurations
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")  # For marker's LLM features
 
 # File storage configuration
 UPLOAD_FOLDER = os.getenv("UPLOAD_FOLDER", "uploads")
@@ -14,7 +13,7 @@ MAX_CONTENT_LENGTH = int(
     os.getenv("MAX_CONTENT_LENGTH", 16 * 1024 * 1024))  # Default 16MB
 
 # LLM configuration
-LLM_MODEL = os.getenv("LLM_MODEL", "gpt-4")
+LLM_MODEL = os.getenv("LLM_MODEL", "gpt-4o-mini")
 LLM_TEMPERATURE = float(os.getenv("LLM_TEMPERATURE", 0.2))
 LLM_MAX_TOKENS = int(os.getenv("LLM_MAX_TOKENS", 1000))
 
