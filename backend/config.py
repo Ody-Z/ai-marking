@@ -15,7 +15,7 @@ MAX_CONTENT_LENGTH = int(
 # LLM configuration
 LLM_MODEL = os.getenv("LLM_MODEL", "gpt-4o-mini")
 LLM_TEMPERATURE = float(os.getenv("LLM_TEMPERATURE", 0.2))
-LLM_MAX_TOKENS = int(os.getenv("LLM_MAX_TOKENS", 1000))
+LLM_MAX_TOKENS = int(os.getenv("LLM_MAX_TOKENS", 10000))
 
 # Marker configuration
 MARKER_USE_LLM = os.getenv(

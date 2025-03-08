@@ -12,7 +12,8 @@ techStack:
     framework: FastAPI
     libraries:
       - markitdown: "Microsoft's open-source tool for converting PDFs (and other file types) to Markdown."
-      - markdown-pdf: "Library (or md2pdf alternative) for converting Markdown back to PDF."
+      - weasyprint: "Library for converting HTML (generated from Markdown) to PDF."
+      - markdown: "Library for converting Markdown to HTML."
       - requests: "Used to call the LLM API for feedback generation."
     description: "The backend orchestrates file uploads, conversion workflows, LLM interactions, and PDF output."
   frontend:
@@ -25,12 +26,14 @@ techStack:
 fileStructure:
   backend:
     - app.py: "Entry point for the FastAPI application; initializes the server and registers endpoints."
-    - config.py: "Holds configuration settings (API keys, Pinecone config if used later, ports, environment variables)."
+    - config.py: "Holds configuration settings (API keys, ports, environment variables)."
+    - endpoints/upload.py: "Handles file uploads and processing requests."
     - services/pdf_processor.py: "Uses MarkItDown to convert uploaded PDFs into Markdown text for further processing."
     - services/llm_service.py: "Handles API calls to the LLM (e.g., GPT-4) for generating marks and feedback based on the Markdown content."
-    - services/marking_engine.py: "Orchestrates the full workflow: receives uploaded files, calls the pdf_processor and llm_service, and then triggers Markdown-to-PDF conversion."
+    - services/md_to_pdf.py: "Converts Markdown back to PDF using the markdown and weasyprint libraries."
+    - services/marking_engine.py: "Orchestrates the full workflow: PDF-to-Markdown conversion, LLM processing, and Markdown-to-PDF conversion."
     - utils/file_helpers.py: "Contains helper functions for file I/O operations, temporary storage, and format conversions."
-    - requirements.txt: "Lists all Python dependencies (FastAPI, markitdown, markdown-pdf or md2pdf, requests, etc.)."
+    - requirements.txt: "Lists all Python dependencies (FastAPI, markitdown, weasyprint, markdown, requests, etc.)."
     - Dockerfile: "Dockerfile for containerizing the backend application."
     - README.md: "Documentation for backend setup, usage, and development guidelines."
   frontend:
@@ -40,6 +43,7 @@ fileStructure:
     - README.md: "Documentation for setting up and using the frontend."
   root:
     - docker-compose.yml: "Orchestrates the backend and frontend containers for local development and deployment."
+    - nginx.conf: "Nginx configuration for serving the frontend and proxying API requests to the backend."
     - .env: "Holds environment variables (API keys, ports, etc.) to keep sensitive data out of source code."
     - README.md: "Overall project documentation, including setup instructions and high-level overview."
 
@@ -52,7 +56,7 @@ codeGuidelines:
 
 cursorRules:
   - "Follow the provided file structure and naming conventions strictly to maintain consistency."
-  - "When adding or modifying code, ensure it aligns with the specified technical stack: use MarkItDown for PDF-to-Markdown conversion and markdown-pdf (or md2pdf) for rendering Markdown back to PDF."
+  - "When adding or modifying code, ensure it aligns with the specified technical stack: use MarkItDown for PDF-to-Markdown conversion and weasyprint for rendering Markdown back to PDF."
   - "All new services or utilities should include documentation and unit tests."
   - "Check this .cursorrules file regularly to ensure that your contributions remain consistent with the overall project guidelines."
   - "Any modifications to the conversion workflow must be clearly documented and justified in code comments and the README files."

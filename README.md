@@ -3,6 +3,8 @@ mvp/
 ├── backend/
 │   ├── app.py
 │   ├── config.py
+│   ├── endpoints/
+│   │   └── upload.py               # Handles file uploads and processing requests
 │   ├── services/
 │   │   ├── pdf_processor.py       # Uses Microsoft MarkItDown to convert PDFs to Markdown.
 │   │   ├── llm_service.py         # Calls the LLM API to generate marks and feedback on the Markdown.
@@ -19,6 +21,8 @@ mvp/
 │   ├── styles.css                 # Basic styling for the upload page.
 │   └── README.md                  # Documentation for frontend setup and usage.
 ├── docker-compose.yml             # Orchestrates backend and frontend containers.
-├── .env                           # Environment variables (API keys, ports, etc.)
-└── README.md                      # Overall project documentation and setup instructions.
+├── .env                           # Environment variables (API keys, ports, etc.)
+├── nginx.conf                     # Nginx configuration for the frontend
+└── README.md                      # Overall project documentation and setup instructions.
+
 
