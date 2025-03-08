@@ -1,18 +1,16 @@
+from backend.config import UPLOAD_FOLDER
+from backend.utils.file_helpers import save_upload_file
+from backend.services.marking_engine import MarkingEngine
 from fastapi import APIRouter, UploadFile, File, Form, HTTPException, BackgroundTasks
 from fastapi.responses import FileResponse
 import os
+import sys
 import uuid
 from datetime import datetime
 
-from services.marking_engine import MarkingEngine
-from utils.file_helpers import save_upload_file
-from config import UPLOAD_FOLDER, MARKITDOWN_ENABLE_PLUGINS, MARKITDOWN_DOCINTEL_ENDPOINT
 
 router = APIRouter()
-marking_engine = MarkingEngine(
-    enable_plugins=MARKITDOWN_ENABLE_PLUGINS,
-    docintel_endpoint=MARKITDOWN_DOCINTEL_ENDPOINT
-)
+marking_engine = MarkingEngine()
 
 
 @router.post("/upload/", summary="Upload marking criteria and homework PDFs")

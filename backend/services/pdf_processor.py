@@ -1,29 +1,34 @@
 import os
 import logging
 from pathlib import Path
-from markitdown import MarkItDown
+from marker.converters.pdf import PdfConverter
+from marker.models import create_model_dict
+from marker.output import text_from_rendered
 
 logger = logging.getLogger(__name__)
 
 
 class PDFProcessor:
     """
-    Uses Microsoft MarkItDown to convert PDFs to Markdown.
+    Uses marker to convert PDFs to Markdown.
     """
 
     def __init__(self, enable_plugins=False, docintel_endpoint=None, llm_client=None, llm_model=None):
         """
-        Initialize the PDF Processor with MarkItDown.
+        Initialize the PDF Processor with marker.
 
         Args:
-            enable_plugins (bool): Whether to enable MarkItDown plugins (not used in 0.0.1a5)
-            docintel_endpoint (str, optional): Azure Document Intelligence endpoint
-            llm_client (object, optional): LLM client for enhanced image descriptions
-            llm_model (str, optional): LLM model name for enhanced image descriptions
+            enable_plugins (bool): Whether to enable plugins (not used)
+            docintel_endpoint (str, optional): Azure Document Intelligence endpoint (not used)
+            llm_client (object, optional): LLM client for enhanced processing
+            llm_model (str, optional): LLM model name
         """
-        logger.info("Initializing PDF Processor with MarkItDown API")
-        # In version 0.0.1a5, MarkItDown doesn't support these parameters
-        self.markitdown = MarkItDown()
+        logger.info("Initializing PDF Processor with marker")
+
+        # Initialize marker converter
+        self.converter = PdfConverter(
+            artifact_dict=create_model_dict(),
+        )
 
         # Store parameters for future use if needed
         self.enable_plugins = enable_plugins
@@ -33,7 +38,7 @@ class PDFProcessor:
 
     def pdf_to_markdown(self, pdf_path):
         """
-        Convert a PDF file to Markdown using Microsoft MarkItDown.
+        Convert a PDF file to Markdown using marker.
 
         Args:
             pdf_path (str): Path to the PDF file
@@ -41,16 +46,16 @@ class PDFProcessor:
         Returns:
             str: Markdown content generated from the PDF
         """
-        logger.info(
-            f"Converting PDF to Markdown using MarkItDown API: {pdf_path}")
+        logger.info(f"Converting PDF to Markdown using marker: {pdf_path}")
 
         if not os.path.exists(pdf_path):
             raise FileNotFoundError(f"PDF file not found: {pdf_path}")
 
         try:
-            # Use MarkItDown Python API to convert PDF to Markdown
-            result = self.markitdown.convert(pdf_path)
-            markdown_content = result.text_content
+            # Convert PDF to Markdown using marker
+            rendered = self.converter(
+                pdf_path, use_llm=self.llm_client is not None)
+            markdown_content, _, _ = text_from_rendered(rendered)
 
             logger.info(
                 f"Successfully converted PDF to Markdown: {len(markdown_content)} characters")
