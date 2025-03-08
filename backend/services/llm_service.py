@@ -83,7 +83,9 @@ class LLMService:
     def _create_prompt(self, criteria_markdown, homework_markdown):
         """Create the prompt for the LLM"""
         return f"""
-# Imagine that you are a Year 12 HSC Business Studies teacher in NSW, Australia. Task: Grade the following student homework based on the provided marking criteria.
+# Imagine that you are a Year 12 HSC Business Studies teacher in NSW, Australia. 
+# Task: Grade the following student homework based on the provided marking criteria.
+# All documents are in markdown format, keep your response in markdown format.
 
 ## Marking Criteria:
 {criteria_markdown}
@@ -93,19 +95,15 @@ class LLMService:
 
 Based on the marking criteria and the student's submission, provide:
 
-1. Detailed feedback on the submission, highlighting strengths and areas for improvement
-2. A numerical mark according to the marking criteria
-3. Specific recommendations for how the student can improve their work
+1. Detailed, constructive feedback on the submission. Use dot point format. One dot point to summarise strengths and a few dot points for areas for improvement. 
+2. A numerical mark according to the marking criteria. The total mark is given in the marking criteria. Be strict with the marking criteria, full marks should only be given for perfect submissions.
 
 Format your response as follows:
 
-MARK: [numerical mark]
+MARK: [numerical mark/total mark]
 
 FEEDBACK:
 [Your detailed feedback here]
-
-RECOMMENDATIONS:
-[Your specific recommendations for improvement]
 """
 
     def _process_response(self, response_text):
