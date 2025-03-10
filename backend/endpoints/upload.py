@@ -1,13 +1,20 @@
-from backend.config import UPLOAD_FOLDER
-from backend.utils.file_helpers import save_upload_file
-from backend.services.marking_engine import MarkingEngine
-from fastapi import APIRouter, UploadFile, File, Form, HTTPException, BackgroundTasks
-from fastapi.responses import FileResponse
 import os
 import sys
 import uuid
 from datetime import datetime
+from fastapi import APIRouter, UploadFile, File, Form, HTTPException, BackgroundTasks
+from fastapi.responses import FileResponse
 
+# Add project root to Python path
+project_root = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), '../..'))
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+
+# Now import local modules
+from backend.config import UPLOAD_FOLDER
+from backend.utils.file_helpers import save_upload_file
+from backend.services.marking_engine import MarkingEngine
 
 router = APIRouter()
 marking_engine = MarkingEngine()
