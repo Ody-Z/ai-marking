@@ -52,9 +52,8 @@ class PDFProcessor:
             raise FileNotFoundError(f"PDF file not found: {pdf_path}")
 
         try:
-            # Convert PDF to Markdown using marker
-            rendered = self.converter(
-                pdf_path, use_llm=self.llm_client is not None)
+            # Convert PDF to Markdown using marker - without use_llm parameter
+            rendered = self.converter(pdf_path)
             markdown_content, _, _ = text_from_rendered(rendered)
 
             logger.info(

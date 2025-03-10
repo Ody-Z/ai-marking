@@ -7,36 +7,37 @@ from weasyprint import HTML
 
 logger = logging.getLogger(__name__)
 
+
 class MarkdownToPDF:
     """
     Converts Markdown content to PDF files.
     """
-    
+
     def __init__(self):
         logger.info("Initializing Markdown to PDF converter")
-    
+
     def convert(self, markdown_content, output_path, title=None, css=None):
         """
         Convert Markdown content to a PDF file.
-        
+
         Args:
             markdown_content (str): Markdown content to convert
             output_path (str): Path where to save the PDF
             title (str, optional): Title for the PDF document
             css (str, optional): Custom CSS for styling
-            
+
         Returns:
             str: Path to the generated PDF file
         """
         logger.info(f"Converting Markdown to PDF, output: {output_path}")
-        
+
         try:
             # Convert markdown to HTML
             html_content = markdown.markdown(
                 markdown_content,
                 extensions=['extra', 'codehilite', 'tables']
             )
-            
+
             # Add HTML document structure with optional title and CSS
             html_document = f"""
             <!DOCTYPE html>
@@ -98,16 +99,23 @@ class MarkdownToPDF:
             </body>
             </html>
             """
-            
+
             # Create parent directory if it doesn't exist
-            os.makedirs(os.path.dirname(os.path.abspath(output_path)), exist_ok=True)
-            
+            parent_dir = os.path.dirname(os.path.abspath(output_path))
+            logger.info(f"Creating directory (if needed): {parent_dir}")
+            os.makedirs(parent_dir, exist_ok=True)
+
+            # Log file path before conversion
+            logger.info(
+                f"About to create PDF at absolute path: {os.path.abspath(output_path)}")
+
             # Convert HTML to PDF using WeasyPrint
-            HTML(string=html_document).write_pdf(output_path)
-            
+            html_obj = HTML(string=html_document)
+            html_obj.write_pdf(output_path)
+
             logger.info(f"Successfully created PDF at {output_path}")
             return output_path
-            
+
         except Exception as e:
             logger.error(f"Error converting Markdown to PDF: {str(e)}")
-            raise 
+            raise

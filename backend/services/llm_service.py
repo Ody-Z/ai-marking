@@ -41,6 +41,11 @@ class LLMService:
         """
         logger.info("Generating feedback using LLM")
 
+        if not self.api_key:
+            logger.error(
+                "No API key set for LLM service. Cannot generate feedback.")
+            return "**Error: No API key provided. Unable to generate feedback.**", 0
+
         # Prepare the prompt for the LLM
         prompt = self._create_prompt(criteria_markdown, homework_markdown)
 
@@ -60,6 +65,8 @@ class LLMService:
                 "temperature": self.temperature,
                 "max_tokens": self.max_tokens
             }
+
+            logger.info(f"Calling LLM API with model: {self.model}")
 
             response = requests.post(
                 "https://api.openai.com/v1/chat/completions",
