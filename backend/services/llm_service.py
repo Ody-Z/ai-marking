@@ -66,12 +66,33 @@ class LLMService:
 
             # Extract the response content
             feedback_text = response_data["choices"][0]["message"]["content"]
-
-            # Process the response to extract marks and feedback
-            marks, feedback_markdown = self._process_response(feedback_text)
-
-            logger.info(f"Successfully generated feedback with mark: {marks}")
-            return feedback_markdown, marks
+            
+            # Extract mark from the response
+            try:
+                # Find and extract the mark
+                for line in feedback_text.split("\n"):
+                    if line.startswith("MARK:"):
+                        mark_text = line.replace("MARK:", "").strip()
+                        # Extract the first number if there's a format like "8/10"
+                        if "/" in mark_text:
+                            mark_text = mark_text.split("/")[0]
+                        marks = float(mark_text)
+                        break
+                else:
+                    # If no mark found, log warning and default to 0
+                    logger.warning("No mark found in LLM response")
+                    marks = 0.0
+                
+                # The rest of the text is the feedback
+                feedback_markdown = feedback_text
+                
+                logger.info(f"Successfully generated feedback with mark: {marks}")
+                return feedback_markdown, marks
+                
+            except Exception as e:
+                logger.error(f"Error extracting mark from response: {str(e)}")
+                # Return the whole response and a default mark
+                return feedback_text, 0.0
 
         except requests.exceptions.RequestException as e:
             logger.error(f"Error calling LLM API: {str(e)}")
@@ -105,31 +126,3 @@ MARK: [numerical mark/total mark]
 FEEDBACK:
 [Your detailed feedback here]
 """
-
-    def _process_response(self, response_text):
-        """
-        Process the LLM response to extract marks and feedback.
-
-        Args:
-            response_text (str): Raw response from the LLM
-
-        Returns:
-            tuple: (marks, feedback_markdown)
-        """
-        try:
-            # Split the response into sections
-            sections = response_text.split("\n\n")
-
-            # Extract mark
-            mark_line = next(line for line in sections[0].split(
-                "\n") if line.startswith("MARK:"))
-            marks = float(mark_line.replace("MARK:", "").strip())
-
-            # Combine feedback and recommendations into markdown
-            feedback_markdown = response_text.replace(mark_line, "").strip()
-
-            return marks, feedback_markdown
-
-        except Exception as e:
-            logger.error(f"Error processing LLM response: {str(e)}")
-            raise ValueError(f"Failed to parse LLM response: {str(e)}")
