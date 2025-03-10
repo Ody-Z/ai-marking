@@ -1,8 +1,14 @@
+from backend.config import OPENAI_API_KEY, LLM_MODEL, LLM_TEMPERATURE, LLM_MAX_TOKENS
 import logging
 import requests
 import json
+import os
+import sys
 from typing import Tuple
-from backend.config import OPENAI_API_KEY, LLM_MODEL, LLM_TEMPERATURE, LLM_MAX_TOKENS
+
+# Add path for relative imports
+sys.path.insert(0, os.path.abspath(
+    os.path.join(os.path.dirname(__file__), '../../..')))
 
 logger = logging.getLogger(__name__)
 
@@ -66,7 +72,7 @@ class LLMService:
 
             # Extract the response content
             feedback_text = response_data["choices"][0]["message"]["content"]
-            
+
             # Extract mark from the response
             try:
                 # Find and extract the mark
@@ -82,13 +88,14 @@ class LLMService:
                     # If no mark found, log warning and default to 0
                     logger.warning("No mark found in LLM response")
                     marks = 0.0
-                
+
                 # The rest of the text is the feedback
                 feedback_markdown = feedback_text
-                
-                logger.info(f"Successfully generated feedback with mark: {marks}")
+
+                logger.info(
+                    f"Successfully generated feedback with mark: {marks}")
                 return feedback_markdown, marks
-                
+
             except Exception as e:
                 logger.error(f"Error extracting mark from response: {str(e)}")
                 # Return the whole response and a default mark

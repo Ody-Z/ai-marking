@@ -1,11 +1,15 @@
 import os
+import sys
 import logging
 import tempfile
 from pathlib import Path
 
-from backend.services.pdf_processor import PDFProcessor
-from backend.services.llm_service import LLMService
+# Add project root to Python path
+sys.path.insert(0, os.path.abspath(
+    os.path.join(os.path.dirname(__file__), '../../..')))
 from backend.services.md_to_pdf import MarkdownToPDF
+from backend.services.llm_service import LLMService
+from backend.services.pdf_processor import PDFProcessor
 
 logger = logging.getLogger(__name__)
 
