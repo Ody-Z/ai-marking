@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import logging
 
 # Import endpoints
-from endpoints.upload import router as upload_router
+from backend.endpoints.upload import router as upload_router
 
 # Setup logging
 logging.basicConfig(
@@ -22,7 +22,7 @@ app = FastAPI(
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # For production, specify exact origins
+    allow_origins=["http://localhost:8080"],  # Frontend URL
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -32,10 +32,12 @@ app.add_middleware(
 app.include_router(upload_router, prefix="/api", tags=["upload"])
 
 # Health check endpoint
+
+
 @app.get("/")
 async def health_check():
     return {"status": "healthy", "service": "Homework Marking System"}
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("app:app", host="0.0.0.0", port=8000, reload=True) 
+    uvicorn.run("app:app", host="0.0.0.0", port=8000, reload=True)
