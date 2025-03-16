@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Student performance dashboard for viewing assignment scores and improvement metrics">
+    <title>Student Performance Dashboard | Homework Marking System</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="dashboard.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        console.log('Chart.js loading check: ', typeof Chart !== 'undefined' ? 'loaded' : 'not loaded');
+    </script>
+</head>
+<body>
+    <!-- Accessibility: Skip to content link -->
+    <a href="#dashboard-content" class="skip-link">Skip to dashboard content</a>
+    
+    <div class="container">
+        <header>
+            <h1>Student Performance Dashboard</h1>
+            <nav class="main-nav" aria-label="Main Navigation">
+                <a href="index.html">Home</a>
+                <a href="dashboard.html" class="active" aria-current="page">Dashboard</a>
+            </nav>
+        </header>
+        
+        <main class="dashboard-container">
+            <div class="dashboard-controls" aria-label="Dashboard Controls">
+                <div class="view-selector" role="tablist" aria-label="Dashboard Views">
+                    <button class="view-btn active" data-view="student" role="tab" aria-selected="true" id="student-tab" aria-controls="student-view">Individual Student</button>
+                    <button class="view-btn" data-view="cohort" role="tab" aria-selected="false" id="cohort-tab" aria-controls="cohort-view">Cohort Overview</button>
+                </div>
+                <div class="filters">
+                    <div class="filter-group">
+                        <label for="date-range">Time Period:</label>
+                        <select id="date-range" aria-label="Filter by time period">
+                            <option value="week">Past Week</option>
+                            <option value="month" selected>Past Month</option>
+                            <option value="semester">Semester</option>
+                            <option value="year">Full Year</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="assignment-type">Assignment Type:</label>
+                        <select id="assignment-type" aria-label="Filter by assignment type">
+                            <option value="all" selected>All Types</option>
+                            <option value="quiz">Quizzes</option>
+                            <option value="assignment">Assignments</option>
+                            <option value="project">Projects</option>
+                            <option value="exam">Exams</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="dashboard-content" role="tabpanel" aria-live="polite">
+                <div class="loading-placeholder" aria-label="Loading dashboard data">Loading dashboard data...</div>
+            </div>
+        </main>
+        
+        <footer>
+            <p>MVP Homework Marking System &copy; 2023</p>
+        </footer>
+    </div>
+    
+    <!-- Debugging console output -->
+    <div id="debug-console" style="display: none; padding: 20px; background: #f0f0f0; border-top: 1px solid #ccc; position: fixed; bottom: 0; left: 0; right: 0; max-height: 200px; overflow: auto;">
+        <h3>Debug Console</h3>
+        <pre id="debug-output"></pre>
+    </div>
+    
+    <!-- Keyboard navigation indicator -->
+    <div class="keyboard-focus-indicator">Keyboard navigation active</div>
+    
+    <script>
+        // Debug logger
+        const debugOutput = document.getElementById('debug-output');
+        const originalConsoleLog = console.log;
+        const originalConsoleError = console.error;
+        
+        // Show debug console with key press
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'D' && e.ctrlKey) {
+                document.getElementById('debug-console').style.display = 
+                    document.getElementById('debug-console').style.display === 'none' ? 'block' : 'none';
+            }
+        });
+        
+        // Override console.log
+        console.log = function() {
+            originalConsoleLog.apply(console, arguments);
+            if (debugOutput) {
+                const args = Array.from(arguments).map(arg => 
+                    typeof arg === 'object' ? JSON.stringify(arg) : arg
+                ).join(' ');
+                debugOutput.textContent += args + '\n';
+            }
+        };
+        
+        // Override console.error
+        console.error = function() {
+            originalConsoleError.apply(console, arguments);
+            if (debugOutput) {
+                const args = Array.from(arguments).map(arg => 
+                    typeof arg === 'object' ? JSON.stringify(arg) : arg
+                ).join(' ');
+                debugOutput.textContent += 'ERROR: ' + args + '\n';
+                document.getElementById('debug-console').style.display = 'block';
+            }
+        };
+        
+        console.log('Debug console initialized');
+    </script>
+    
+    <script src="dashboard.js"></script>
+    
+    <!-- Detect keyboard navigation -->
+    <script>
+        (function() {
+            // Add class to body when user is navigating with keyboard
+            function handleFirstTab(e) {
+                if (e.key === 'Tab') {
+                    document.body.classList.add('keyboard-navigation');
+                    
+                    // Remove listener after first Tab press
+                    window.removeEventListener('keydown', handleFirstTab);
+                    
+                    // Add listener to detect mouse usage
+                    window.addEventListener('mousedown', handleMouseDownOnce);
+                }
+            }
+            
+            // Remove class when user clicks with mouse
+            function handleMouseDownOnce() {
+                document.body.classList.remove('keyboard-navigation');
+                
+                // Re-add keyboard listener
+                window.removeEventListener('mousedown', handleMouseDownOnce);
+                window.addEventListener('keydown', handleFirstTab);
+            }
+            
+            // Initialize keyboard navigation detection
+            window.addEventListener('keydown', handleFirstTab);
+        })();
+    </script>
+</body>
+</html> 

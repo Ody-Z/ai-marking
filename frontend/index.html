@@ -3,16 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AI-powered homework marking system for educators">
     <title>Homework Marking System</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <!-- Accessibility: Skip to content link -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
     <div class="container">
         <header>
             <h1>AI Homework Marking System</h1>
+            <nav class="main-nav">
+                <a href="index.html" class="active" aria-current="page">Home</a>
+                <a href="dashboard.html">Dashboard</a>
+            </nav>
         </header>
         
-        <main>
+        <main id="main-content">
             <div class="upload-section">
                 <h2>Upload Documents</h2>
                 <form id="upload-form">
@@ -55,6 +63,39 @@
         </footer>
     </div>
     
+    <!-- Keyboard navigation indicator -->
+    <div class="keyboard-focus-indicator">Keyboard navigation active</div>
+    
     <script src="app.js"></script>
+    
+    <!-- Detect keyboard navigation -->
+    <script>
+        (function() {
+            // Add class to body when user is navigating with keyboard
+            function handleFirstTab(e) {
+                if (e.key === 'Tab') {
+                    document.body.classList.add('keyboard-navigation');
+                    
+                    // Remove listener after first Tab press
+                    window.removeEventListener('keydown', handleFirstTab);
+                    
+                    // Add listener to detect mouse usage
+                    window.addEventListener('mousedown', handleMouseDownOnce);
+                }
+            }
+            
+            // Remove class when user clicks with mouse
+            function handleMouseDownOnce() {
+                document.body.classList.remove('keyboard-navigation');
+                
+                // Re-add keyboard listener
+                window.removeEventListener('mousedown', handleMouseDownOnce);
+                window.addEventListener('keydown', handleFirstTab);
+            }
+            
+            // Initialize keyboard navigation detection
+            window.addEventListener('keydown', handleFirstTab);
+        })();
+    </script>
 </body>
 </html> 

@@ -25,6 +25,30 @@ header {
     border-radius: 5px 5px 0 0;
 }
 
+.main-nav {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.main-nav a {
+    color: white;
+    text-decoration: none;
+    padding: 5px 15px;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+.main-nav a:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.main-nav a.active {
+    background-color: rgba(255, 255, 255, 0.3);
+    font-weight: 500;
+}
+
 main {
     background-color: white;
     padding: 20px;
@@ -124,6 +148,59 @@ footer {
     padding: 20px;
     color: #7f8c8d;
     font-size: 14px;
+}
+
+/* Accessibility Styles */
+.skip-link {
+    position: absolute;
+    top: -40px;
+    left: 0;
+    background-color: #3498db;
+    color: white;
+    padding: 8px;
+    z-index: 1001;
+    transition: top 0.3s;
+}
+
+.skip-link:focus {
+    top: 0;
+}
+
+:focus {
+    outline: 2px solid #3498db;
+    outline-offset: 2px;
+}
+
+:focus:not(:focus-visible) {
+    outline: none;
+}
+
+:focus-visible {
+    outline: 2px solid #3498db;
+    outline-offset: 2px;
+}
+
+/* Keyboard navigation indicator */
+.keyboard-focus-indicator {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 10px;
+    border-radius: 4px;
+    font-size: 14px;
+    z-index: 1000;
+    display: none;
+}
+
+body.keyboard-navigation .keyboard-focus-indicator {
+    display: block;
+}
+
+/* Make sure hidden elements are truly hidden */
+[hidden] {
+    display: none !important;
 }
 
 @media (max-width: 600px) {
