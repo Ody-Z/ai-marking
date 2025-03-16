@@ -39,3 +39,4 @@ uploads/
 # Logs
 *.log
 logs/
+.env
