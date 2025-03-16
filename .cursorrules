@@ -11,7 +11,7 @@ techStack:
     language: Python
     framework: FastAPI
     libraries:
-      - markitdown: "Microsoft's open-source tool for converting PDFs (and other file types) to Markdown."
+      - Marker: "Marker converts documents to markdown, JSON, and HTML quickly and accurately, using deep learning."
       - weasyprint: "Library for converting HTML (generated from Markdown) to PDF."
       - markdown: "Library for converting Markdown to HTML."
       - requests: "Used to call the LLM API for feedback generation."
@@ -32,10 +32,18 @@ fileStructure:
     - services/llm_service.py: "Handles API calls to the LLM (e.g., GPT-4) for generating marks and feedback based on the Markdown content."
     - services/md_to_pdf.py: "Converts Markdown back to PDF using the markdown and weasyprint libraries."
     - services/marking_engine.py: "Orchestrates the full workflow: PDF-to-Markdown conversion, LLM processing, and Markdown-to-PDF conversion."
+    - services/__init__.py: "Make services a proper Python package."
     - utils/file_helpers.py: "Contains helper functions for file I/O operations, temporary storage, and format conversions."
     - requirements.txt: "Lists all Python dependencies (FastAPI, markitdown, weasyprint, markdown, requests, etc.)."
     - Dockerfile: "Dockerfile for containerizing the backend application."
     - README.md: "Documentation for backend setup, usage, and development guidelines."
+    - run_tests.py: "Script to run all or specific tests for the application."
+    - tests/__init__.py: "Make tests a proper Python package."
+    - tests/services/__init__.py: "Make tests/services a proper Python package."
+    - tests/services/test_marking_engine.py: "Unit tests for the marking engine service."
+    - tests/services/test_llm_service.py: "Unit tests for the LLM service."
+    - tests/services/test_pdf_processor.py: "Unit tests for the PDF processor service."
+    - tests/README.md: "Documentation for test setup, usage, and guidelines."
   frontend:
     - index.html: "A simple HTML page that provides a form for uploading PDFs."
     - app.js: "JavaScript to handle file uploads, communicate with the backend API, and display results."
@@ -46,6 +54,7 @@ fileStructure:
     - nginx.conf: "Nginx configuration for serving the frontend and proxying API requests to the backend."
     - .env: "Holds environment variables (API keys, ports, etc.) to keep sensitive data out of source code."
     - README.md: "Overall project documentation, including setup instructions and high-level overview."
+    - .gitignore: "Specifies files and directories to be ignored by Git, including .env and virtual environment files."
 
 codeGuidelines:
   - "Maintain the modular file structure as defined above to ensure separation of concerns between services, utilities, and endpoints."
