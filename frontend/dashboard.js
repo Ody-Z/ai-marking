@@ -266,9 +266,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (currentView === 'student') {
             studentView.removeAttribute('hidden');
             cohortView.setAttribute('hidden', '');
+            studentView.classList.add('active');
+            cohortView.classList.remove('active');
         } else {
             studentView.setAttribute('hidden', '');
             cohortView.removeAttribute('hidden');
+            cohortView.classList.add('active');
+            studentView.classList.remove('active');
         }
         
         // Update content based on filters
